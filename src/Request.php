@@ -3,6 +3,8 @@
 namespace Imsidow\Wapi;
 
 use GuzzleHttp\Client;
+use Psr\Http\Message\ResponseInterface;
+use Imsidow\Wapi\Enumerations\ResponseStatusCode;
 
 class Request
 {
@@ -11,6 +13,12 @@ class Request
     private string $merchantUid;
     private string $apiUserId;
     private string $apiKey;
+    private array $statusCodeMessage = [
+        430 => 'insufficient balance',
+        432 => 'invalid pin code',
+        434 => 'user cancel',
+        436 => 'request timeout',
+    ];
 
     public function __construct(string $merchantUid, string $apiUserId, string $apiKey)
     {
@@ -21,11 +29,11 @@ class Request
 
     public function send(array $request = [])
     {
-        print_r($this->formatRequest($request));
-        return $this->client()->post('', ["json" => $this->formatRequest($request)]);
+        $response = $this->client()->post('', ["json" => $this->formatRequest($request)]);
+        return $this->formatResponse($response);
     }
 
-    private function formatRequest(array $request)
+    private function formatRequest(array $request): array
     {
         return [
             "schemaVersion" => "1.0",
@@ -44,8 +52,51 @@ class Request
         ];
     }
 
+    private function formatResponse($response): array
+    {
+        $response = json_decode($response->getBody()->getContents(), true);
+        if ($response['errorCode'] === 'E10205') {
+            return $this->errorResponse($response);
+        }
+    }
+
+    private function errorResponse($response): array
+    {
+        $statusCode = $this->responseMessageToStatusCode($response['responseMsg']);
+        return [
+            "error" => true,
+            "message" => $this->statusCodeMessage[$statusCode],
+            "statusCode" => $statusCode,
+            "params" => [
+                "timestamp" => $response['timestamp'],
+                "requestId" => $response['requestId'],
+                "transactionId" => $this->getTransactionIdFromResponseMessage($response['responseMsg']),
+                ...$response['params']
+            ]
+        ];
+    }
+
+    private function getTransactionIdFromResponseMessage(string $message): string
+    {
+        preg_match('/TransactionId: (\w+)/i', $message, $out);
+        return $out[1] ?? "";
+    }
+
+    private function responseMessageToStatusCode(string $message): int
+    {
+        if (preg_match('/Invalid PIN code/i', $message)) {
+            return ResponseStatusCode::INVALID_PIN_CODE;
+        } else if (preg_match('/error occurred/i', $message)) {
+            return ResponseStatusCode::USER_CANCEL;
+        } else if (preg_match('/balance is not sufficient/i', $message)) {
+            return ResponseStatusCode::INSUFFICIENT_BALANCE;
+        }
+
+        return ResponseStatusCode::UNKNOWN;
+    }
+
     private function client(): Client
     {
-        return new Client(['base_uri' => $this->baseUrl, 'timeout' => 1000]);
+        return new Client(['base_uri' => $this->baseUrl, 'timeout' => 15]);
     }
 }
