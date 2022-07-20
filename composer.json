@@ -1,0 +1,19 @@
+{
+    "name": "imsidow/wapi",
+    "description": "waafi pay api reformat",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Imsidow\\Wapi\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Asad Ali Sidow",
+            "email": "sidow.code@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {}
+}
