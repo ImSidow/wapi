@@ -3,7 +3,6 @@
 namespace Imsidow\Wapi;
 
 use GuzzleHttp\Client;
-use Psr\Http\Message\ResponseInterface;
 use Imsidow\Wapi\Enumerations\ResponseStatusCode;
 
 class Request
