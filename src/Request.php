@@ -96,6 +96,6 @@ class Request
 
     private function client(): Client
     {
-        return new Client(['base_uri' => $this->baseUrl, 'timeout' => 15]);
+        return new Client(['base_uri' => $this->baseUrl, 'timeout' => 20]);
     }
 }
