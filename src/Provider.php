@@ -51,25 +51,21 @@ class Provider
             ]
         ];
         $response = $this->request->send($request);
-        // echo $response->getStatusCode();
-
-        // error code => E10205 -> user cancel
-        // error code => 5206 -> insufficient balance
-
-        // RCS_TRAN_FAILED_AT_ISSUER_SYSTEM (Your account balance is not sufficient
-        // RCS_TRAN_FAILED_AT_ISSUER_SYSTEM (error occurred, please try again later
-        // RCS_TRAN_FAILED_AT_ISSUER_SYSTEM (Invalid PIN code
-
         echo json_encode($response);
-        // print_r($response->getBody()->getContents());
-
-
-
         return $this;
     }
 
     public function refundPayment()
     {
+        $request = [
+            "serviceName" => "API_PREAUTHORIZE",
+            'transactionId' => "24280691",
+            'description' => "Cancel Transaction",
+            'referenceId' => "00001"
+        ];
+        $response = $this->request->send($request);
+
+        echo json_encode($response);
     }
 
     public function cancelPurchase()

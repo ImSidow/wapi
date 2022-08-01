@@ -29,25 +29,29 @@ class Request
     public function send(array $request = [])
     {
         $response = $this->client()->post('', ["json" => $this->formatRequest($request)]);
-        return $this->formatResponse($response);
+        // return $this->formatResponse($response);
+
+        // print_r($response);
+
+        return $response;
     }
 
     private function formatRequest(array $request): array
     {
+        $serviceName = $request['serviceName'];
+        unset($request['serviceName']);
+
         return [
             "schemaVersion" => "1.0",
             "requestId" => rand(1000000000, 9999999999),
             "timestamp" => time(),
             "channelName" => "WEB",
-            "serviceName" => $request['serviceName'],
-            "serviceParams" => [
+            "serviceName" => $serviceName,
+            "serviceParams" => array_merge([
                 "merchantUid" => $this->merchantUid,
                 "apiUserId" => $this->apiUserId,
                 "apiKey" => $this->apiKey,
-                "paymentMethod" => "MWALLET_ACCOUNT",
-                "payerInfo" => $request['payerInfo'],
-                "transactionInfo" => $request['transactionInfo']
-            ]
+            ], $request)
         ];
     }
 

@@ -9,5 +9,7 @@ $wapi->requestMobilePayment([
     "mobile" => "252616505113",
     "reference" => '0001',
     "invoiceNo" => "00001",
-    "amount" => 100
+    "amount" => 0.1
 ]);
+
+// $wapi->refundPayment();
