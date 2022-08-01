@@ -17,6 +17,7 @@ class Request
         432 => 'invalid pin code',
         434 => 'user cancel',
         436 => 'request timeout',
+        438 => 'invalid phone number',
     ];
 
     public function __construct(string $merchantUid, string $apiUserId, string $apiKey)
@@ -29,11 +30,8 @@ class Request
     public function send(array $request = [])
     {
         $response = $this->client()->post('', ["json" => $this->formatRequest($request)]);
-        // return $this->formatResponse($response);
-
-        // print_r($response);
-
-        return $response;
+        // return $this->formatResponse($response, $request['serviceName']);
+        return json_decode($response->getBody()->getContents(), true);
     }
 
     private function formatRequest(array $request): array
@@ -55,11 +53,13 @@ class Request
         ];
     }
 
-    private function formatResponse($response): array
+    private function formatResponse($response, $serviceName): array
     {
         $response = json_decode($response->getBody()->getContents(), true);
         if ($response['errorCode'] === 'E10205') {
             return $this->errorResponse($response);
+        } else if ($response['errorCode'] === '0') {
+            return $this->successResponse($response);
         }
     }
 
@@ -79,6 +79,19 @@ class Request
         ];
     }
 
+    private function successResponse($response): array
+    {
+        return [
+            "message" => 'successful',
+            "statusCode" => 200,
+            "params" => [
+                "timestamp" => $response['timestamp'],
+                "requestId" => $response['requestId'],
+                ...$response['params']
+            ]
+        ];
+    }
+
     private function getTransactionIdFromResponseMessage(string $message): string
     {
         preg_match('/TransactionId: (\w+)/i', $message, $out);
@@ -93,6 +106,8 @@ class Request
             return ResponseStatusCode::USER_CANCEL;
         } else if (preg_match('/balance is not sufficient/i', $message)) {
             return ResponseStatusCode::INSUFFICIENT_BALANCE;
+        } else if (preg_match('/Receiver Subscriber not found/i', $message)) {
+            return ResponseStatusCode::INVALID_PHONE_NUMBER;
         }
 
         return ResponseStatusCode::UNKNOWN;

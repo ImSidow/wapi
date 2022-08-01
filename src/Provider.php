@@ -37,6 +37,7 @@ class Provider
     {
         $request = [
             "serviceName" => "API_PREAUTHORIZE",
+            'paymentMethod' => "MWALLET_ACCOUNT",
             "payerInfo" => [
                 "accountNo" => $options['mobile']
             ],
@@ -55,16 +56,30 @@ class Provider
         return $this;
     }
 
-    public function refundPayment()
+    /**
+     * refund the amount paid by the customer
+     * 
+     * @param array $options [
+     * 
+     *  -   reference: string
+     *  -   transactionId: string
+     *  -   description: string Optional.
+     * 
+     * ]
+     * 
+     * @return Provider
+     * 
+     */
+    public function refundPayment(array $options)
     {
         $request = [
-            "serviceName" => "API_PREAUTHORIZE",
-            'transactionId' => "24280691",
-            'description' => "Cancel Transaction",
-            'referenceId' => "00001"
+            "serviceName" => "API_PREAUTHORIZE_CANCEL",
+            'transactionId' => $options['transactionId'],
+            'description' => $options['description'],
+            'referenceId' => $options['reference'],
         ];
-        $response = $this->request->send($request);
 
+        $response = $this->request->send($request);
         echo json_encode($response);
     }
 
