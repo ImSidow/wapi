@@ -59,7 +59,7 @@ class Provider
     /**
      * refund the amount paid by the customer
      * 
-     * @param array $options [
+     * @param array $options [ 
      * 
      *  -   reference: string
      *  -   transactionId: string
