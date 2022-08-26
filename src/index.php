@@ -6,8 +6,8 @@ use Imsidow\Wapi\Provider;
 $wapi = new Provider('M0910278', '1000389', 'API-2126079682AHX');
 
 $wapi->requestMobilePayment([
-    "mobile" => "252616505113",
-    "reference" => '0001',
+    "mobile" => "2526165051133",
+    "reference" => '0021',
     "invoiceNo" => "00021",
     // "amount" => 0.1 
 ]);
