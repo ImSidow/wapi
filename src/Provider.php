@@ -14,7 +14,7 @@ class Provider
     }
 
     /**
-     * send request to customer to pay using mobile payment
+     * send payment request to customer to pay using mobile
      * 
      * @param array $options [
      * 
@@ -33,7 +33,7 @@ class Provider
      * 
      */
 
-    public function requestMobilePayment(array $options): Provider
+    public function requestPayment(array $options): Provider
     {
         $request = [
             "serviceName" => "API_PREAUTHORIZE",
@@ -70,7 +70,7 @@ class Provider
      * @return Provider
      * 
      */
-    public function refundPayment(array $options)
+    public function cancelRequestPayment(array $options)
     {
         $request = [
             "serviceName" => "API_PREAUTHORIZE_CANCEL",
@@ -83,11 +83,46 @@ class Provider
         echo json_encode($response);
     }
 
-    public function cancelPurchase()
+    /**
+     * refund the amount paid by the customer
+     * 
+     * @param array $options [ 
+     * 
+     *  -   transactionId: string
+     *  -   reference: string
+     *  -   description: string Optional.
+     * 
+     * ]
+     * 
+     * @return Provider
+     * 
+     */
+    public function cancelPurchase(array $options)
     {
+        $request = [
+            "serviceName" => "API_CANCELPURCHASE",
+            'transactionId' => $options['transactionId'],
+            'description' => $options['description'],
+            'referenceId' => $options['reference'],
+        ];
+
+        $response = $this->request->send($request);
+        echo json_encode($response);
     }
 
-    public function requestCardPayment()
+    public function getAccountInfo()
     {
+        $request = [
+            "serviceName" => "API_GETACCOUNTINFO",
+            "paymentMethod" => "MWALLET_ACCOUNT",
+            'payerInfo' => [
+                "accountNo" => "252615414470",
+                "accountType" => "MERCHANT",
+                "currency" => "USD",
+            ],
+        ];
+
+        $response = $this->request->send($request);
+        echo json_encode($response);
     }
 }
