@@ -30,8 +30,8 @@ class Request
     public function send(array $request = [])
     {
         $response = $this->client()->post('', ["json" => $this->formatRequest($request)]);
-        // return $this->formatResponse($response, $request['serviceName']);
-        return json_decode($response->getBody()->getContents(), true);
+        return $this->formatResponse($response, $request['serviceName']);
+        // return json_decode($response->getBody()->getContents(), true);
     }
 
     private function formatRequest(array $request): array
@@ -53,13 +53,13 @@ class Request
         ];
     }
 
-    private function formatResponse($response, $serviceName): array
+    private function formatResponse($response, $serviceName): object
     {
         $response = json_decode($response->getBody()->getContents(), true);
         if ($response['errorCode'] === 'E10205') {
-            return $this->errorResponse($response);
+            return (object) $this->errorResponse($response);
         } else if ($response['errorCode'] === '0') {
-            return $this->successResponse($response);
+            return (object) $this->successResponse($response);
         }
     }
 

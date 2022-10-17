@@ -7,10 +7,27 @@ use Imsidow\Wapi\Request;
 class Provider
 {
     private Request $request;
+    private $response;
 
     public function __construct(string $merchantUid, string $apiUserId, string $apiKey)
     {
         $this->request = new Request($merchantUid, $apiUserId, $apiKey);
+    }
+
+    public function success(callable $callback): Provider
+    {
+        // message, object, code
+        $res = $this->response;
+        if (!isset($res->error)) $callback($res, $res->message, $res->statusCode);
+        return $this;
+    }
+
+    public function error(callable $callback): Provider
+    {
+        // message, object, code
+        $res = $this->response;
+        if (isset($res->error)) $callback($res, $res->message, $res->statusCode);
+        return $this;
     }
 
     /**
@@ -51,8 +68,7 @@ class Provider
                 "transactionCategory" => $options['category'] ?? ""
             ]
         ];
-        $response = $this->request->send($request);
-        echo json_encode($response);
+        $this->response = $this->request->send($request);
         return $this;
     }
 
@@ -70,7 +86,7 @@ class Provider
      * @return Provider
      * 
      */
-    public function cancelRequestPayment(array $options)
+    public function cancelRequestPayment(array $options): Provider
     {
         $request = [
             "serviceName" => "API_PREAUTHORIZE_CANCEL",
@@ -78,9 +94,8 @@ class Provider
             'description' => $options['description'],
             'referenceId' => $options['reference'],
         ];
-
-        $response = $this->request->send($request);
-        echo json_encode($response);
+        $this->response = $this->request->send($request);
+        return $this;
     }
 
     /**
@@ -97,7 +112,7 @@ class Provider
      * @return Provider
      * 
      */
-    public function cancelPurchase(array $options)
+    public function cancelPurchase(array $options): Provider
     {
         $request = [
             "serviceName" => "API_CANCELPURCHASE",
@@ -105,9 +120,8 @@ class Provider
             'description' => $options['description'],
             'referenceId' => $options['reference'],
         ];
-
-        $response = $this->request->send($request);
-        echo json_encode($response);
+        $this->response = $this->request->send($request);
+        return $this;
     }
 
     public function getAccountInfo()

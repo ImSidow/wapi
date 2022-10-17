@@ -5,12 +5,22 @@ use Imsidow\Wapi\Provider;
 
 $wapi = new Provider('M0910278', '1000389', 'API-2126079682AHX');
 
-// $wapi->requestPayment([
-//     "mobile" => "252616505113",
-//     "reference" => '0121',
-//     "invoiceNo" => "12321",
-//     "amount" => 0.1
-// ]);
+$wapi->requestPayment([
+    "mobile" => "252616505113",
+    "reference" => '0121',
+    "invoiceNo" => "12321",
+    "amount" => 0.1
+])
+    ->success(function ($res, $message, $code) {
+        echo json_encode($res);
+        echo $message;
+        echo $code;
+    })
+    ->error(function ($res, $message, $code) {
+        echo json_encode($res);
+        echo $message;
+        echo $code;
+    });
 
 // $wapi->refundPayment([
 //     'transactionId' => '02123232',
@@ -18,11 +28,11 @@ $wapi = new Provider('M0910278', '1000389', 'API-2126079682AHX');
 //     'reference' => '0001',
 // ]);
 
-$wapi->getAccountInfo([
-    'transactionId' => '26268322',
-    'description' => 'test',
-    'reference' => '0001',
-]);
+// $wapi->getAccountInfo([
+//     'transactionId' => '26268322',
+//     'description' => 'test',
+//     'reference' => '0001',
+// ]);
 
 // {"schemaVersion":"1.0","timestamp":"2022-08-01 19:25:43.436","requestId":"8534022951","sessionId":null,
     // "responseCode":"5206","errorCode":"E10205","responseMsg":"RCS_TRAN_FAILED_AT_ISSUER_SYSTEM (Receiver Subscriber not found, TransactionId: 25446479)","params":[]}
