@@ -112,7 +112,7 @@ class Provider
      * @return Provider
      * 
      */
-    public function cancelPurchase(array $options): Provider
+    public function refund(array $options): Provider
     {
         $request = [
             "serviceName" => "API_CANCELPURCHASE",
