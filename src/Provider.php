@@ -30,6 +30,14 @@ class Provider
         return $this;
     }
 
+    public function response(callable $successCallback, callable $errorCallback)
+    {
+        // message, object, code
+        $res = $this->response;
+        if (isset($res->error)) return $errorCallback($res, $res->message, $res->statusCode);
+        else return $successCallback($res, $res->message, $res->statusCode);
+    }
+
     /**
      * send payment request to customer to pay using mobile
      * 
